@@ -16,11 +16,11 @@ qt_add_executable(appwinchroma src/main.cpp)
 qt_add_qml_module(appwinchroma
     URI winchroma
     SOURCES
-        src/dwm/process_utils.h src/dwm/process_utils.cpp
+        src/utils/process_utils.h src/utils/process_utils.cpp
         src/dwm/window_effects.h src/dwm/window_effects.cpp
+        src/dwm/window_watcher.h src/dwm/window_watcher.cpp
     QML_FILES
         qml/Main.qml
-        SOURCES src/dwm/window_effects.h src/dwm/window_effects.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -34,7 +34,7 @@ set_target_properties(appwinchroma PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-target_include_directories(appwinchroma PRIVATE src src/dwm)
+target_include_directories(appwinchroma PRIVATE src src/dwm src/utils)
 
 target_link_libraries(appwinchroma PRIVATE
     Qt6::Quick
