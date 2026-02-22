@@ -13,18 +13,32 @@ class WindowEffects : public QObject
     QML_SINGLETON
 public:
     explicit WindowEffects(QObject *parent = nullptr);
+    ~WindowEffects();
+
+    // -- BORDER COLORS -- //
 
     Q_INVOKABLE void setWindowBorderByHWND(quintptr hwnd, const QColor &color);
-    Q_INVOKABLE void setWindowBorderByTitle(const QString &title, const QColor &color);
     Q_INVOKABLE void resetWindowBorderByHWND(quintptr hwnd);
 
     Q_INVOKABLE void setAllWindowBorders(const QColor &color);
     Q_INVOKABLE void resetAllWindowBorders();
 
+    // -- TITLEBAR COLORS -- //
+
+    Q_INVOKABLE void setWindowCaptionColorByHWND(quintptr hwnd, const QColor &color);
+    Q_INVOKABLE void resetWindowCaptionColorByHWND(quintptr hwnd);
+
+    Q_INVOKABLE void setAllWindowCaptionColors(const QColor &color);
+    Q_INVOKABLE void resetAllWindowCaptionColors();
+
+    // -- TITLEBAR TEXT COLORS -- //
+
+    Q_INVOKABLE void setWindowCaptionTextColorByHWND(quintptr hwnd, const QColor &color);
+    Q_INVOKABLE void resetWindowCaptionTextColorByHWND(quintptr hwnd);
+
+    Q_INVOKABLE void setAllWindowCaptionTextColors(const QColor &color);
+    Q_INVOKABLE void resetAllWindowCaptionTextColors();
 signals:
-private:
-    void setWindowAttribute(HWND hwnd, DWORD attribute, const void *value, DWORD size);
-    void setWindowAttribute(quintptr hwnd, DWORD attribute, const void *value, DWORD size); // for QML
 };
 
 #endif // WINDOW_EFFECTS_H
