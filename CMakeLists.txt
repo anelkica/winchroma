@@ -16,6 +16,7 @@ qt_add_executable(appwinchroma src/main.cpp)
 qt_add_qml_module(appwinchroma
     URI winchroma
     SOURCES
+        src/registry/registry_manager.h src/registry/registry_manager.cpp
         src/utils/process_utils.h src/utils/process_utils.cpp
         src/dwm/window_effects.h src/dwm/window_effects.cpp
         src/dwm/window_watcher.h src/dwm/window_watcher.cpp
@@ -34,7 +35,7 @@ set_target_properties(appwinchroma PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-target_include_directories(appwinchroma PRIVATE src src/dwm src/utils)
+target_include_directories(appwinchroma PRIVATE include src src/dwm src/registry src/utils)
 
 target_link_libraries(appwinchroma PRIVATE
     Qt6::Quick
