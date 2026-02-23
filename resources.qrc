@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/window_header_horizontal_24_regular.svg</file>
+        <file>icons/window_24_regular.svg</file>
+        <file>icons/border_outside_24_regular.svg</file>
+        <file>icons/border_none_24_regular.svg</file>
+        <file>icons/color_background_24_regular.svg</file>
+        <file>icons/highlight_24_regular.svg</file>
+        <file>icons/info_24_regular.svg</file>
+        <file>icons/settings_24_regular.svg</file>
+    </qresource>
+</RCC>

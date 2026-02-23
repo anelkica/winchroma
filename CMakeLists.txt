@@ -10,8 +10,8 @@ find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2) # QuickControls2 for 
 
 qt_standard_project_setup(REQUIRES 6.8)
 
-
-qt_add_executable(appwinchroma src/main.cpp)
+qt_add_resources(RESOURCES resources.qrc) # why doesn't Qt Creator do this by itself???
+qt_add_executable(appwinchroma src/main.cpp ${RESOURCES})
 
 qt_add_qml_module(appwinchroma
     URI winchroma
@@ -20,6 +20,8 @@ qt_add_qml_module(appwinchroma
         src/utils/process_utils.h src/utils/process_utils.cpp
         src/dwm/window_effects.h src/dwm/window_effects.cpp
         src/dwm/window_watcher.h src/dwm/window_watcher.cpp
+    RESOURCES
+        resources.qrc
     QML_FILES
         qml/Main.qml
 )
