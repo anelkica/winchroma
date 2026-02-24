@@ -24,6 +24,11 @@ qt_add_qml_module(appwinchroma
         resources.qrc
     QML_FILES
         qml/Main.qml
+        QML_FILES qml/pages/BordersPage.qml
+        QML_FILES qml/components/ColorPanel.qml
+        QML_FILES
+        QML_FILES qml/pages/TitlebarsPage.qml
+        QML_FILES qml/pages/HighlightsPage.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

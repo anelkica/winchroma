@@ -19,7 +19,7 @@ import winchroma
 ApplicationWindow {
     id: root
     visible: true
-    minimumWidth: expandedWidth + 384
+    minimumWidth: expandedWidth + 456
     minimumHeight: 400
     title: "winchroma"
     palette.accent: "#ff99cc"
@@ -30,10 +30,14 @@ ApplicationWindow {
     readonly property int expandedWidth: 220
     readonly property int collapsedWidth: 56
 
+    Component { id: bordersPage; BordersPage {} }
+    Component { id: titlebarsPage; TitlebarsPage {} }
+    Component { id: highlightsPage; HighlightsPage {} }
+
     property var navModel: [
-        { icon: "qrc:/icons/border_none_24_regular.svg", label: "Borders" },
-        { icon: "qrc:/icons/window_header_horizontal_24_regular.svg", label: "Titlebars" },
-        { icon: "qrc:/icons/highlight_24_regular.svg", label: "Highlights" },
+        { icon: "qrc:/icons/border_none_24_regular.svg", label: "Borders", page: bordersPage },
+        { icon: "qrc:/icons/window_header_horizontal_24_regular.svg", label: "Titlebars", page: titlebarsPage },
+        { icon: "qrc:/icons/highlight_24_regular.svg", label: "Highlights", page: highlightsPage },
         //{ icon: "qrc:/icons/border_none_24_regular.svg", label: "Accents" },
     ]
 
@@ -151,7 +155,9 @@ ApplicationWindow {
 
                         onClicked: {
                             root.activeIndex = index
-                            contentStack.replace(null)
+
+                            let activePage = navModel[activeIndex].page
+                            contentStack.replace(activePage)
                         }
                     }
                 }
@@ -209,12 +215,25 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            initialItem: Item {
-                Label {
-                    anchors.centerIn: parent
-                    text: navModel[root.activeIndex].label
-                    font.pixelSize: 18
-                    color: "#f5f0f2"
+            initialItem: navModel[root.activeIndex].page
+
+            replaceEnter: Transition {
+                NumberAnimation {
+                    property: "opacity"
+                    from: 0
+                    to: 1
+                    duration: 150
+                    easing.type: Easing.InOutQuad
+                }
+            }
+
+            replaceExit: Transition {
+                NumberAnimation {
+                    property: "opacity"
+                    from: 1
+                    to: 0
+                    duration: 150
+                    easing.type: Easing.InOutQuad
                 }
             }
         }

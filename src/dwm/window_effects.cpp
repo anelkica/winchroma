@@ -9,6 +9,32 @@ WindowEffects::~WindowEffects() {
     resetAllWindowCaptionTextColors();
 }
 
+// returns hwnd if window already exists, if not, creates window and returns new hwnd
+Q_INVOKABLE quintptr WindowEffects::openPreviewWindow() {
+    if (m_previewWindow && m_previewWindow->visibility() != QWindow::Hidden) {
+        m_previewWindow->raise();
+        //m_previewWindow->requestActivate();
+        return m_previewWindow->winId();
+    }
+
+    m_previewWindow = new QQuickWindow();
+    m_previewWindow->setTitle("preview — winchroma");
+    m_previewWindow->setColor(QColor(32,32,32)); // #202020
+
+    m_previewWindow->setMinimumWidth(300);
+    m_previewWindow->setMinimumHeight(300);
+
+    m_previewWindow->show();
+    return m_previewWindow->winId();
+}
+
+Q_INVOKABLE quintptr WindowEffects::getPreviewHWND() {
+    if (m_previewWindow && m_previewWindow->visibility() != QWindow::Hidden)
+        return m_previewWindow->winId();
+
+    return 0; // doesn't exist
+}
+
 // -- BORDER COLORS -- //
 
 Q_INVOKABLE void WindowEffects::setWindowBorderByHWND(quintptr hwnd, const QColor &color) {

@@ -5,6 +5,7 @@
 #include <QQmlEngine>
 #include <QColor>
 #include <windows.h>
+#include <QQuickWindow>
 
 class WindowEffects : public QObject
 {
@@ -14,6 +15,9 @@ class WindowEffects : public QObject
 public:
     explicit WindowEffects(QObject *parent = nullptr);
     ~WindowEffects();
+
+    Q_INVOKABLE quintptr openPreviewWindow(); // returns HWND (quintptr) if it's already open
+    Q_INVOKABLE quintptr getPreviewHWND(); // returns 0 if it doesn't exist, good for checking if it exists
 
     // -- BORDER COLORS -- //
 
@@ -39,6 +43,8 @@ public:
     Q_INVOKABLE void setAllWindowCaptionTextColors(const QColor &color);
     Q_INVOKABLE void resetAllWindowCaptionTextColors();
 signals:
+private:
+    QQuickWindow *m_previewWindow = nullptr;
 };
 
 #endif // WINDOW_EFFECTS_H
