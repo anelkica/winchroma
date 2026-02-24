@@ -14,3 +14,8 @@ This project uses `C++23`.
 - [Desktop Window Manager (DWM)](https://learn.microsoft.com/en-us/windows/win32/api/_dwm/)
 - [Use Modern C++ to Access the Windows Registry - GiovanniDicanio](https://learn.microsoft.com/en-us/archive/msdn-magazine/2017/may/c-use-modern-c-to-access-the-windows-registry)
 - [WinReg - GiovanniDicanio](https://github.com/GiovanniDicanio/WinReg)
+
+## 📸 Screenshots
+<div align="center">
+    <img width="677" height="398" src="https://github.com/user-attachments/assets/c0b164bd-6510-4aec-a8f3-26c18549856d">
+</div>
