@@ -35,6 +35,8 @@ Item {
             Layout.fillHeight: true
             ScrollBar.vertical.policy: ScrollBar.AsNeeded
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+
         }
 
         RowLayout {

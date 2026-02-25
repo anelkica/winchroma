@@ -35,6 +35,64 @@ Item {
             Layout.fillHeight: true
             ScrollBar.vertical.policy: ScrollBar.AsNeeded
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+            ColumnLayout {
+                spacing: 12
+
+                ColumnLayout {
+                    Label {
+                        text: "TITLEBAR COLOR"
+                        font.weight: Font.Medium
+                        font.pixelSize: 12
+                        font.letterSpacing: 0.75
+                    }
+
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 1
+                        color: palette.midlight
+                    }
+                }
+
+                ColorPanel {
+                    id: titlebarColorPanel
+                    onPickedColorChanged: {
+                        let hwnd = WindowEffects.getPreviewHWND()
+                        if (hwnd === 0) return // 0 = doesn't exist
+
+                        WindowEffects.setWindowCaptionColorByHWND(hwnd, titlebarColorPanel.pickedColor)
+                    }
+                }
+
+                ColumnLayout {
+                    Layout.topMargin: 12
+
+                    Label {
+                        text: "TITLEBAR TEXT COLOR"
+                        font.weight: Font.Medium
+                        font.pixelSize: 12
+                        font.letterSpacing: 0.75
+                    }
+
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 1
+                        color: palette.midlight
+                    }
+                }
+
+                ColorPanel {
+                    id: titlebarTextColorPanel
+                    onPickedColorChanged: {
+                        let hwnd = WindowEffects.getPreviewHWND()
+                        if (hwnd === 0) return // 0 = doesn't exist
+
+                        WindowEffects.setWindowCaptionTextColorByHWND(hwnd, titlebarTextColorPanel.pickedColor)
+                    }
+                }
+            }
         }
 
         RowLayout {
@@ -54,6 +112,8 @@ Item {
                 text: "Apply"
                 highlighted: true
                 onClicked: {
+                    WindowEffects.setAllWindowCaptionColors(titlebarColorPanel.pickedColor)
+                    WindowEffects.setAllWindowCaptionTextColors(titlebarTextColorPanel.pickedColor)
                 }
             }
         }
