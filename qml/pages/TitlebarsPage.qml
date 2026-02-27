@@ -9,6 +9,22 @@ Item {
 
     property bool hasChanges: true
 
+    Component.onCompleted: {
+        titlebarColorPanel.setColor(AppSettings.titlebarColor)
+        titlebarTextColorPanel.setColor(AppSettings.titlebarTextColor)
+    }
+
+    Connections {
+        target: WindowWatcher
+        function onWindowCreated(hwnd) {
+            if (titlebarColorPanel.customizationEnabled)
+                WindowEffects.setWindowCaptionColorByHWND(hwnd, titlebarColorPanel.pickedColor)
+
+            if (titlebarTextColorPanel.customizationEnabled)
+                WindowEffects.setWindowCaptionTextColorByHWND(hwnd, titlebarTextColorPanel.pickedColor)
+        }
+    }
+
     ColumnLayout {
         anchors.margins: 24
         anchors.fill: parent
@@ -59,8 +75,16 @@ Item {
 
                 ColorPanel {
                     id: titlebarColorPanel
+
+                    customizationEnabled: AppSettings.titlebarColorEnabled
+                    onCustomizationEnabledChanged: {
+                        hasChanges = true
+                        AppSettings.titlebarColorEnabled = customizationEnabled
+                    }
+
                     onPickedColorChanged: {
                         hasChanges = true
+                        AppSettings.titlebarColor = titlebarColorPanel.pickedColor
 
                         let hwnd = WindowEffects.getPreviewHWND()
                         if (hwnd === 0) return // 0 = doesn't exist
@@ -89,8 +113,16 @@ Item {
 
                 ColorPanel {
                     id: titlebarTextColorPanel
+
+                    customizationEnabled: AppSettings.titlebarTextColorEnabled
+                    onCustomizationEnabledChanged: {
+                        hasChanges = true
+                        AppSettings.titlebarTextColorEnabled = customizationEnabled
+                    }
+
                     onPickedColorChanged: {
                         hasChanges = true
+                        AppSettings.titlebarTextColor = titlebarTextColorPanel.pickedColor
 
                         let hwnd = WindowEffects.getPreviewHWND()
                         if (hwnd === 0) return // 0 = doesn't exist
@@ -119,8 +151,16 @@ Item {
                 highlighted: hasChanges
                 enabled: hasChanges
                 onClicked: {
-                    WindowEffects.setAllWindowCaptionColors(titlebarColorPanel.pickedColor)
-                    WindowEffects.setAllWindowCaptionTextColors(titlebarTextColorPanel.pickedColor)
+                    if (titlebarColorPanel.customizationEnabled)
+                        WindowEffects.setAllWindowCaptionColors(titlebarColorPanel.pickedColor)
+                    else
+                        WindowEffects.resetAllWindowCaptionColors()
+
+                    if (titlebarTextColorPanel.customizationEnabled)
+                        WindowEffects.setAllWindowCaptionTextColors(titlebarTextColorPanel.pickedColor)
+                    else
+                        WindowEffects.resetAllWindowCaptionTextColors()
+
                     hasChanges = false
                 }
             }

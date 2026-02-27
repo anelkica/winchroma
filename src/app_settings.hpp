@@ -29,11 +29,23 @@ class AppSettings : public QObject {
 
     QML_PROPERTY(QColor, borderColor, QColor(255, 153, 204)) // #ff99cc (pink)
     QML_PROPERTY(bool, borderEnabled, true)
+
+    QML_PROPERTY(QColor, titlebarColor, QColor(25, 25, 25))
+    QML_PROPERTY(bool, titlebarColorEnabled, true)
+
+    QML_PROPERTY(QColor, titlebarTextColor, QColor(255, 255, 255))
+    QML_PROPERTY(bool, titlebarTextColorEnabled, true)
 public:
     explicit AppSettings(QObject *parent = nullptr) : QObject(parent) {}
 signals:
     void borderColorChanged(const QColor &value);
     void borderEnabledChanged(const bool &value);
+
+    void titlebarColorChanged(const QColor &value);
+    void titlebarColorEnabledChanged(const bool &value);
+
+    void titlebarTextColorChanged(const QColor &value);
+    void titlebarTextColorEnabledChanged(const bool &value);
 };
 
 #endif // APP_SETTINGS_HPP

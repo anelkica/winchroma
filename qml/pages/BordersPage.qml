@@ -16,8 +16,8 @@ Item {
     Connections {
         target: WindowWatcher
         function onWindowCreated(hwnd) {
-
-            WindowEffects.setWindowBorderByHWND(hwnd, borderColorPanel.pickedColor)
+            if (borderColorPanel.customizationEnabled)
+                WindowEffects.setWindowBorderByHWND(hwnd, borderColorPanel.pickedColor)
         }
     }
 
@@ -72,7 +72,10 @@ Item {
                     id: borderColorPanel
 
                     customizationEnabled: AppSettings.borderEnabled
-                    onCustomizationEnabledChanged: AppSettings.borderEnabled = customizationEnabled
+                    onCustomizationEnabledChanged: {
+                        hasChanges = true
+                        AppSettings.borderEnabled = customizationEnabled
+                    }
 
                     onPickedColorChanged: {
                         hasChanges = true
@@ -107,7 +110,11 @@ Item {
                 highlighted: hasChanges
                 enabled: hasChanges
                 onClicked: {
-                    WindowEffects.setAllWindowBorders(borderColorPanel.pickedColor)
+                    if (borderColorPanel.customizationEnabled)
+                        WindowEffects.setAllWindowBorders(borderColorPanel.pickedColor)
+                    else
+                        WindowEffects.resetAllWindowBorders()
+
                     hasChanges = false
                 }
             }
