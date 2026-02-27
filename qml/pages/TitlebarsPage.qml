@@ -7,6 +7,8 @@ import winchroma
 Item {
     id: titlebarsPageRoot
 
+    property bool hasChanges: true
+
     ColumnLayout {
         anchors.margins: 24
         anchors.fill: parent
@@ -58,6 +60,8 @@ Item {
                 ColorPanel {
                     id: titlebarColorPanel
                     onPickedColorChanged: {
+                        hasChanges = true
+
                         let hwnd = WindowEffects.getPreviewHWND()
                         if (hwnd === 0) return // 0 = doesn't exist
 
@@ -86,6 +90,8 @@ Item {
                 ColorPanel {
                     id: titlebarTextColorPanel
                     onPickedColorChanged: {
+                        hasChanges = true
+
                         let hwnd = WindowEffects.getPreviewHWND()
                         if (hwnd === 0) return // 0 = doesn't exist
 
@@ -110,10 +116,12 @@ Item {
             // https://invent.kde.org/arnout/qtdeclarative/-/blob/d5171b14251cf4abd7d8ad16288690af53248856/src/quickcontrols/fluentwinui3/Button.qml
             Button {
                 text: "Apply"
-                highlighted: true
+                highlighted: hasChanges
+                enabled: hasChanges
                 onClicked: {
                     WindowEffects.setAllWindowCaptionColors(titlebarColorPanel.pickedColor)
                     WindowEffects.setAllWindowCaptionTextColors(titlebarTextColorPanel.pickedColor)
+                    hasChanges = false
                 }
             }
         }

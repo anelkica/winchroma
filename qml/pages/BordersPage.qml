@@ -7,6 +7,20 @@ import winchroma
 Item {
     id: bordersPageRoot
 
+    property bool hasChanges: true
+
+    Component.onCompleted: {
+        borderColorPanel.setColor(AppSettings.borderColor)
+    }
+
+    Connections {
+        target: WindowWatcher
+        function onWindowCreated(hwnd) {
+
+            WindowEffects.setWindowBorderByHWND(hwnd, borderColorPanel.pickedColor)
+        }
+    }
+
     ColumnLayout {
         anchors.margins: 24
         anchors.fill: parent
@@ -47,7 +61,6 @@ Item {
                         font.letterSpacing: 0.75
                     }
 
-
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 1
@@ -57,7 +70,14 @@ Item {
 
                 ColorPanel {
                     id: borderColorPanel
+
+                    customizationEnabled: AppSettings.borderEnabled
+                    onCustomizationEnabledChanged: AppSettings.borderEnabled = customizationEnabled
+
                     onPickedColorChanged: {
+                        hasChanges = true
+                        AppSettings.borderColor = borderColorPanel.pickedColor
+
                         let hwnd = WindowEffects.getPreviewHWND()
                         if (hwnd === 0) return // 0 = doesn't exist
 
@@ -84,9 +104,11 @@ Item {
             // https://invent.kde.org/arnout/qtdeclarative/-/blob/d5171b14251cf4abd7d8ad16288690af53248856/src/quickcontrols/fluentwinui3/Button.qml
             Button {
                 text: "Apply"
-                highlighted: true
+                highlighted: hasChanges
+                enabled: hasChanges
                 onClicked: {
                     WindowEffects.setAllWindowBorders(borderColorPanel.pickedColor)
+                    hasChanges = false
                 }
             }
         }

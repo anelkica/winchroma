@@ -41,6 +41,11 @@ ApplicationWindow {
         //{ icon: "qrc:/icons/border_none_24_regular.svg", label: "Accents" },
     ]
 
+    Component.onCompleted: {
+        WindowWatcher.startWatching()
+        RegistryManager.setKey("Control Panel\\Colors")
+    }
+
     RowLayout {
         anchors.fill: parent
         spacing: 0

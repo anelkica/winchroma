@@ -4,7 +4,7 @@ project(winchroma VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
+set(CMAKE_AUTOMOC ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2) # QuickControls2 for Windows theme
 
@@ -29,6 +29,7 @@ qt_add_qml_module(appwinchroma
         QML_FILES
         QML_FILES qml/pages/TitlebarsPage.qml
         QML_FILES qml/pages/HighlightsPage.qml
+        SOURCES src/app_settings.hpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

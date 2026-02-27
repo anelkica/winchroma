@@ -19,10 +19,11 @@
     most important regkeys:
         > HKEY_CURRENT_USER\Control Panel\Colors
 
-        + Hilight     - selection background color
-        + HilightText - ditto, for text
-        + Menu        - background of context menus
-        + MenuText    - ditto, for text
+        + Hilight          - text selection background color
+        + HotTrackingColor - mouse drag selection color
+        + HilightText      - change color of selected text
+        + Menu             - background of context menus
+        + MenuText         - ditto, for text
 
 */
 
@@ -43,6 +44,23 @@ public:
 	std::expected<void, winreg::RegResult> WriteString(const std::wstring& valueName, const std::wstring& value);
 
     // -- QML HANDLERS -- //
+    Q_INVOKABLE void restoreDefaults();
+
+    // sends a global boradcasst to tell windows the selection colors are changed
+    Q_INVOKABLE void refreshSettings() {
+        DWORD_PTR result;
+        SendMessageTimeoutW(
+            HWND_BROADCAST,
+            WM_SETTINGCHANGE,
+            0,
+            (LPARAM)L"Control Panel\\Colors",
+            SMTO_ABORTIFHUNG,
+            5000,
+            &result
+        );
+    }
+
+    Q_INVOKABLE QString colorToRegistryString(const QColor &color);
 
     Q_INVOKABLE bool setKey(const QString &subkey);
 
@@ -56,6 +74,11 @@ signals:
     void errorOccurred(const QString &message);
 private:
 	winreg::RegKey m_key;
+
+    static constexpr const wchar_t* DEFAULT_HILIGHT             = L"0 120 215";
+    static constexpr const wchar_t* DEFAULT_HILIGHT_TEXT        = L"255 255 255";
+    static constexpr const wchar_t* DEFAULT_HOT_TRACKING_COLOR  = L"0 102 204";
+
 };
 
 #endif // !REGISTRYMANAGER_H

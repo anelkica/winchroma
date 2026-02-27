@@ -1,4 +1,5 @@
 #include "registry_manager.h"
+#include <qcolor.h>
 
 RegistryManager::RegistryManager(QObject *parent) : QObject{parent} {}
 
@@ -50,6 +51,26 @@ std::expected<void, winreg::RegResult> RegistryManager::WriteString(const std::w
 };
 
 // -- QML HANDLERS -- //
+void RegistryManager::restoreDefaults() {
+    auto result = WriteString(L"Hilight", DEFAULT_HILIGHT);
+    if (!result)
+        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+
+    result = WriteString(L"HilightText", DEFAULT_HILIGHT_TEXT);
+    if (!result)
+        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+
+    result = WriteString(L"HotTrackingColor", DEFAULT_HOT_TRACKING_COLOR);
+    if (!result)
+        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+}
+
+QString RegistryManager::colorToRegistryString(const QColor &color) {
+    return QString("%1 %2 %3")
+        .arg(color.red())
+        .arg(color.green())
+        .arg(color.blue());
+}
 
 bool RegistryManager::setKey(const QString &subkey) {
     // there's really no reason not to use HKEY_CURRENT_USER, unless we're gonna read system Accent color?
