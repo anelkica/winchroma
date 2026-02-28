@@ -114,6 +114,18 @@ QString RegistryManager::colorToRegistryString(const QColor &color) {
         .arg(color.blue());
 }
 
+QColor RegistryManager::registryStringToColor(const QString &registryRgbString) {
+    if (registryRgbString.isEmpty()) return QColor();
+
+    // "255 255 255" -> ["255", "153", "204"]
+    QStringList parts = registryRgbString.split(' ', Qt::SkipEmptyParts);
+    if (parts.size() >= 3) {
+        return QColor(parts[0].toInt(), parts[1].toInt(), parts[2].toInt());
+    }
+
+    return QColor();
+}
+
 bool RegistryManager::setKey(const QString &subkey) {
     // there's really no reason not to use HKEY_CURRENT_USER, unless we're gonna read system Accent color?
     auto result = SetKey(HKEY_CURRENT_USER, subkey.toStdWString());

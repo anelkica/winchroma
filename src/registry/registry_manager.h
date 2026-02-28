@@ -57,7 +57,9 @@ public:
 
     static COLORREF QColorToCOLORREF(const QColor &color);
     static std::wstring QColorToWString(const QColor &color); // formats to "R G B" string format
+
     Q_INVOKABLE QString colorToRegistryString(const QColor &color); // for writeString() usage in QML
+    Q_INVOKABLE QColor registryStringToColor(const QString &registryRgbString); // "R G B" format to QColor
 signals:
     void errorOccurred(const QString &message);
 private:

@@ -9,6 +9,28 @@ Item {
 
     property bool hasChanges: true
 
+    function updateColors() {
+        let hilightRgbString = RegistryManager.readString("Hilight") // ex. "255 255 255"
+        if (hilightRgbString !== "") {
+            let validColor = RegistryManager.registryStringToColor(hilightRgbString)
+            textHighlightColorPanel.setColor(validColor)
+        }
+
+        let hilightTextRgbString = RegistryManager.readString("HilightText")
+        if (hilightTextRgbString !== "") {
+            let validColor = RegistryManager.registryStringToColor(hilightTextRgbString)
+            highlightedTextColorPanel.setColor(validColor)
+        }
+
+        let hotTrackingRgbString = RegistryManager.readString("HotTrackingColor")
+        if (hotTrackingRgbString !== "") {
+            let validColor = RegistryManager.registryStringToColor(hotTrackingRgbString)
+            mouseDragColorPanel.setColor(validColor)
+        }
+    }
+
+    Component.onCompleted: updateColors()
+
     ColumnLayout {
         anchors.margins: 24
         anchors.fill: parent
@@ -43,7 +65,7 @@ Item {
 
                 ColumnLayout {
                     Label {
-                        text: "TEXT HIGHLIGHT COLOR"
+                        text: "HIGHLIGHT COLOR"
                         font.weight: Font.Medium
                         font.pixelSize: 12
                         font.letterSpacing: 0.75
@@ -73,7 +95,37 @@ Item {
 
                 ColumnLayout {
                     Label {
-                        text: "MOUSE DRAG COLOR"
+                        text: "HIGHLIGHTED TEXT COLOR"
+                        font.weight: Font.Medium
+                        font.pixelSize: 12
+                        font.letterSpacing: 0.75
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 1
+                        color: palette.midlight
+                    }
+                }
+
+                ColorPanel {
+                    id: highlightedTextColorPanel
+
+                    customizationEnabled: AppSettings.hilightTextEnabled
+                    onCustomizationEnabledChanged: {
+                        hasChanges = true
+                        AppSettings.hilightTextEnabled = customizationEnabled
+                    }
+
+                    onPickedColorChanged: {
+                        hasChanges = true
+                        AppSettings.hilightTextColor = textHighlightColorPanel.pickedColor
+                    }
+                }
+
+                ColumnLayout {
+                    Label {
+                        text: "MOUSE SELECTION COLOR"
                         font.weight: Font.Medium
                         font.pixelSize: 12
                         font.letterSpacing: 0.75
@@ -132,12 +184,14 @@ Item {
                 enabled: hasChanges
                 onClicked: {
                     let textHighlightColorString = RegistryManager.colorToRegistryString(textHighlightColorPanel.pickedColor)
+                    let highlightedTextColorString = RegistryManager.colorToRegistryString(highlightedTextColorPanel.pickedColor)
                     let mouseDragColorString = RegistryManager.colorToRegistryString(mouseDragColorPanel.pickedColor)
 
                     RegistryManager.writeString("Hilight", textHighlightColorString)
+                    RegistryManager.writeString("HilightText", highlightedTextColorString)
                     RegistryManager.writeString("HotTrackingColor", mouseDragColorString)
-                    RegistryManager.broadcastColorChange(textHighlightColorPanel.pickedColor, mouseDragColorPanel.pickedColor)
 
+                    RegistryManager.broadcastColorChange(textHighlightColorPanel.pickedColor, mouseDragColorPanel.pickedColor)
                     hasChanges = false
                 }
             }

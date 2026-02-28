@@ -46,6 +46,9 @@ class AppSettings : public QObject {
     QML_PROPERTY(QColor, hilightColor, QColor(0, 120, 215))
     QML_PROPERTY(bool, hilightEnabled, true)
 
+    QML_PROPERTY(QColor, hilightTextColor, QColor(255, 255, 255))
+    QML_PROPERTY(bool, hilightTextEnabled, true)
+
     QML_PROPERTY(QColor, hotTrackingColor, QColor(0, 120, 215))
     QML_PROPERTY(bool, hotTrackingEnabled, true)
 
