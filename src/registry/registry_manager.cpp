@@ -1,7 +1,20 @@
 #include "registry_manager.h"
+#include <app_settings.hpp>
 #include <qcolor.h>
 
 RegistryManager::RegistryManager(QObject *parent) : QObject{parent} {}
+
+COLORREF RegistryManager::QColorToCOLORREF(const QColor &color) {
+    return RGB(color.red(), color.green(), color.blue());
+}
+
+std::wstring RegistryManager::QColorToWString(const QColor &color) {
+    return QString("%1 %2 %3")
+        .arg(color.red())
+        .arg(color.green())
+        .arg(color.blue())
+        .toStdWString();
+}
 
 std::expected<void, winreg::RegResult> RegistryManager::SetKey(HKEY key, const std::wstring& subkey) {
 	winreg::RegResult result = m_key.TryCreate(key, subkey, KEY_READ | KEY_WRITE);
@@ -52,17 +65,46 @@ std::expected<void, winreg::RegResult> RegistryManager::WriteString(const std::w
 
 // -- QML HANDLERS -- //
 void RegistryManager::restoreDefaults() {
-    auto result = WriteString(L"Hilight", DEFAULT_HILIGHT);
+    auto result = WriteString(L"Hilight", QColorToWString(AppDefaults::Hilight));
     if (!result)
         emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
 
-    result = WriteString(L"HilightText", DEFAULT_HILIGHT_TEXT);
+    result = WriteString(L"HilightText", QColorToWString(AppDefaults::HilightText));
     if (!result)
         emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
 
-    result = WriteString(L"HotTrackingColor", DEFAULT_HOT_TRACKING_COLOR);
+    result = WriteString(L"HotTrackingColor", QColorToWString(AppDefaults::HotTrackingColor));
     if (!result)
         emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+
+    broadcastColorChange(AppDefaults::Hilight, AppDefaults::HotTrackingColor);
+}
+
+void RegistryManager::broadcastColorChange(const QColor &hilight, const QColor &hotTrackingColor) {
+    int elements[] = { COLOR_HIGHLIGHT, COLOR_HOTLIGHT }; // hotlight = hotTrackingColor
+    COLORREF colors[] = { this->QColorToCOLORREF(hilight), this->QColorToCOLORREF(hotTrackingColor) };
+    SetSysColors(2, elements, colors);
+
+    // i'll just broadcast both WM_SYSCOLORCHANGE and WM_SETTINGSCHANGE, hope it works lol
+    DWORD_PTR result;
+    SendMessageTimeoutW(
+        HWND_BROADCAST,
+        WM_SYSCOLORCHANGE,
+        0, 0,
+        SMTO_ABORTIFHUNG,
+        2000,
+        &result
+        );
+
+    SendMessageTimeoutW(
+        HWND_BROADCAST,
+        WM_SETTINGCHANGE,
+        0,
+        (LPARAM)L"Control Panel\\Colors",
+        SMTO_ABORTIFHUNG,
+        2000,
+        &result
+        );
 }
 
 QString RegistryManager::colorToRegistryString(const QColor &color) {

@@ -58,7 +58,17 @@ Item {
 
                 ColorPanel {
                     id: textHighlightColorPanel
-                    onPickedColorChanged: hasChanges = true
+
+                    customizationEnabled: AppSettings.hilightEnabled
+                    onCustomizationEnabledChanged: {
+                        hasChanges = true
+                        AppSettings.hilightEnabled = customizationEnabled
+                    }
+
+                    onPickedColorChanged: {
+                        hasChanges = true
+                        AppSettings.hilightColor = textHighlightColorPanel.pickedColor
+                    }
                 }
 
                 ColumnLayout {
@@ -78,7 +88,17 @@ Item {
 
                 ColorPanel {
                     id: mouseDragColorPanel
-                    onPickedColorChanged: hasChanges = true
+
+                    customizationEnabled: AppSettings.hotTrackingEnabled
+                    onCustomizationEnabledChanged: {
+                        hasChanges = true
+                        AppSettings.hotTrackingEnabled = customizationEnabled
+                    }
+
+                    onPickedColorChanged: {
+                        hasChanges = true
+                        AppSettings.hotTrackingColor = mouseDragColorPanel.pickedColor
+                    }
                 }
             }
         }
@@ -116,6 +136,7 @@ Item {
 
                     RegistryManager.writeString("Hilight", textHighlightColorString)
                     RegistryManager.writeString("HotTrackingColor", mouseDragColorString)
+                    RegistryManager.broadcastColorChange(textHighlightColorPanel.pickedColor, mouseDragColorPanel.pickedColor)
 
                     hasChanges = false
                 }

@@ -114,10 +114,10 @@ Item {
                 ColorPanel {
                     id: titlebarTextColorPanel
 
-                    customizationEnabled: AppSettings.titlebarTextColorEnabled
+                    customizationEnabled: AppSettings.titlebarTextEnabled
                     onCustomizationEnabledChanged: {
                         hasChanges = true
-                        AppSettings.titlebarTextColorEnabled = customizationEnabled
+                        AppSettings.titlebarTextEnabled = customizationEnabled
                     }
 
                     onPickedColorChanged: {

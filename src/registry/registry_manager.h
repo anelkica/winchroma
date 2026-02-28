@@ -45,22 +45,7 @@ public:
 
     // -- QML HANDLERS -- //
     Q_INVOKABLE void restoreDefaults();
-
-    // sends a global boradcasst to tell windows the selection colors are changed
-    Q_INVOKABLE void refreshSettings() {
-        DWORD_PTR result;
-        SendMessageTimeoutW(
-            HWND_BROADCAST,
-            WM_SETTINGCHANGE,
-            0,
-            (LPARAM)L"Control Panel\\Colors",
-            SMTO_ABORTIFHUNG,
-            5000,
-            &result
-        );
-    }
-
-    Q_INVOKABLE QString colorToRegistryString(const QColor &color);
+    Q_INVOKABLE void broadcastColorChange(const QColor &hilight, const QColor &hotTrackingColor);
 
     Q_INVOKABLE bool setKey(const QString &subkey);
 
@@ -70,15 +55,13 @@ public:
     Q_INVOKABLE QString readString(const QString &valueName);
     Q_INVOKABLE bool writeString(const QString &valueName, const QString &value);
 
+    static COLORREF QColorToCOLORREF(const QColor &color);
+    static std::wstring QColorToWString(const QColor &color); // formats to "R G B" string format
+    Q_INVOKABLE QString colorToRegistryString(const QColor &color); // for writeString() usage in QML
 signals:
     void errorOccurred(const QString &message);
 private:
 	winreg::RegKey m_key;
-
-    static constexpr const wchar_t* DEFAULT_HILIGHT             = L"0 120 215";
-    static constexpr const wchar_t* DEFAULT_HILIGHT_TEXT        = L"255 255 255";
-    static constexpr const wchar_t* DEFAULT_HOT_TRACKING_COLOR  = L"0 102 204";
-
 };
 
 #endif // !REGISTRYMANAGER_H
