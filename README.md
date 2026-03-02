@@ -1,4 +1,7 @@
 # 🎨 winchroma
+![C++](https://img.shields.io/badge/C++-23-blue?style=flat-square&logo=c%2B%2B)
+![Qt](https://img.shields.io/badge/Qt-6.10-41CD52?style=flat-square&logo=qt)
+![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white)
 > A modern Windows theming utility.
 
 Qt C++ system tweaker for modifying and coloring fine-grained Windows features such as window borders, highlights, titlebars and such.
