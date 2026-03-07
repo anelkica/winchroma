@@ -43,17 +43,22 @@ class AppSettings : public QObject {
     QML_PROPERTY(QColor, titlebarTextColor, QColor(255, 255, 255))
     QML_PROPERTY(bool, titlebarTextEnabled, true)
 
-    QML_PROPERTY(QColor, hilightColor, QColor(0, 120, 215))
+    QML_PROPERTY(QColor, hilightColor, QColor())
     QML_PROPERTY(bool, hilightEnabled, true)
 
-    QML_PROPERTY(QColor, hilightTextColor, QColor(255, 255, 255))
+    QML_PROPERTY(QColor, hilightTextColor, QColor())
     QML_PROPERTY(bool, hilightTextEnabled, true)
 
-    QML_PROPERTY(QColor, hotTrackingColor, QColor(0, 120, 215))
+    QML_PROPERTY(QColor, hotTrackingColor, QColor())
     QML_PROPERTY(bool, hotTrackingEnabled, true)
 
 public:
-    explicit AppSettings(QObject *parent = nullptr) : QObject(parent) {}
+    explicit AppSettings(QObject *parent = nullptr) : QObject(parent) { s_instance = this; }
+
+    static AppSettings *instance() { return s_instance; }
+
+private:
+    static inline AppSettings *s_instance = nullptr;
 };
 
 #endif // APP_SETTINGS_HPP

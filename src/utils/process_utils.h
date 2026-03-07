@@ -12,6 +12,9 @@ public:
     static HWND getWindowByTitle(const QString &title);
 
     static QList<HWND> getAllWindowsFromPid(DWORD pid); // al windows belonging to PID
+
+    static QString getWindowTitleFromHwnd(HWND hwnd);
+    static QString getProcessNameFromHwnd(HWND hwnd);
 };
 
 #endif // PROCESS_UTILS_H

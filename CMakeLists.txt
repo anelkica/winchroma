@@ -20,16 +20,19 @@ qt_add_qml_module(appwinchroma
         src/utils/process_utils.h src/utils/process_utils.cpp
         src/dwm/window_effects.h src/dwm/window_effects.cpp
         src/dwm/window_watcher.h src/dwm/window_watcher.cpp
-    RESOURCES
-        resources.qrc
+        src/config/config_manager.h src/config/config_manager.cpp
+        src/app_settings.hpp
     QML_FILES
         qml/Main.qml
-        QML_FILES qml/pages/BordersPage.qml
-        QML_FILES qml/components/ColorPanel.qml
-        QML_FILES
-        QML_FILES qml/pages/TitlebarsPage.qml
-        QML_FILES qml/pages/HighlightsPage.qml
-        SOURCES src/app_settings.hpp
+        qml/pages/BordersPage.qml
+        qml/pages/TitlebarsPage.qml
+        qml/pages/HighlightsPage.qml
+
+        qml/components/ColorPanel.qml
+    RESOURCES
+        resources.qrc
+        config.toml
+        QML_FILES qml/pages/ConfigPage.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -43,12 +46,21 @@ set_target_properties(appwinchroma PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-target_include_directories(appwinchroma PRIVATE include src src/dwm src/registry src/utils)
+target_include_directories(appwinchroma PRIVATE
+    src
+    src/dwm
+    src/config
+    src/registry
+    src/utils
+    third_party/WinReg
+    third_party/tomlplusplus
+)
 
 target_link_libraries(appwinchroma PRIVATE
     Qt6::Quick
     Qt6::QuickControls2 # for Windows theme
     dwmapi
+    psapi
 )
 
 include(GNUInstallDirs)

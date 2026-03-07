@@ -14,17 +14,6 @@ Item {
         titlebarTextColorPanel.setColor(AppSettings.titlebarTextColor)
     }
 
-    Connections {
-        target: WindowWatcher
-        function onWindowCreated(hwnd) {
-            if (titlebarColorPanel.customizationEnabled)
-                WindowEffects.setWindowCaptionColorByHWND(hwnd, titlebarColorPanel.pickedColor)
-
-            if (titlebarTextColorPanel.customizationEnabled)
-                WindowEffects.setWindowCaptionTextColorByHWND(hwnd, titlebarTextColorPanel.pickedColor)
-        }
-    }
-
     ColumnLayout {
         anchors.margins: 24
         anchors.fill: parent
@@ -161,6 +150,7 @@ Item {
                     else
                         WindowEffects.resetAllWindowCaptionTextColors()
 
+                    ConfigManager.reapplyAllRules()
                     hasChanges = false
                 }
             }

@@ -1,0 +1,14 @@
+[globals]
+border                = "#ff99cc"
+border_enabled        = true
+
+titlebar              = "#191919"
+titlebar_enabled      = false
+
+titlebar_text         = "#ffffff"
+titlebar_text_enabled = false
+
+[[rules]]
+name = "notepad green border"
+process = "Notepad.exe"
+border = "#8bf7c5"

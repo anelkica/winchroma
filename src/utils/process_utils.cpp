@@ -1,5 +1,7 @@
 #include "process_utils.h"
+#include <QFileInfo>
 #include <windows.h>
+#include <Psapi.h>
 
 struct EnumData
 {
@@ -48,4 +50,40 @@ HWND ProcessUtils::getWindowByTitle(const QString &title) {
         qDebug("No window found by title");
 
     return hwnd;
+}
+
+QString ProcessUtils::getProcessNameFromHwnd(HWND hwnd) {
+    if (hwnd == nullptr)
+        return QString();
+
+    DWORD pid = 0;
+    GetWindowThreadProcessId(hwnd, &pid);
+    if (pid == 0)
+        return QString();
+
+    const HANDLE handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+    if (handle == nullptr)
+        return QString();
+
+    wchar_t path[MAX_PATH];
+    const DWORD length = GetModuleFileNameExW(handle, nullptr, path, MAX_PATH);
+    CloseHandle(handle);
+
+    if (length == 0)
+        return QString();
+
+    return QFileInfo(QString::fromWCharArray(path)).fileName();
+}
+
+QString ProcessUtils::getWindowTitleFromHwnd(HWND hwnd) {
+    if (hwnd == nullptr)
+        return QString();
+
+    wchar_t title[256];
+    int length = GetWindowTextW(hwnd, title, 256);
+
+    if (length == 0)
+        return QString();
+
+    return QString::fromWCharArray(title);
 }

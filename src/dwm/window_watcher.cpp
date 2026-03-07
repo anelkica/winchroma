@@ -1,4 +1,5 @@
 #include "window_watcher.h"
+#include <QFileInfo>
 
 WindowWatcher::WindowWatcher(QObject *parent) : QObject{parent} {}
 
@@ -11,10 +12,10 @@ Q_INVOKABLE void WindowWatcher::startWatching() {
 
     s_instance = this;
     m_hook = SetWinEventHook(
-        EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE,
+        EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW,
         nullptr, winEventCallback,
         0, 0,
-        WINEVENT_OUTOFCONTEXT
+        WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS
     );
 
     if (!m_hook)
@@ -42,5 +43,15 @@ void CALLBACK WindowWatcher::winEventCallback(
     if (idObject != OBJID_WINDOW || !hwnd || !s_instance) return;
     if (!IsWindow(hwnd)) return;
 
-    emit s_instance->windowCreated(reinterpret_cast<quintptr>(hwnd));
+    //DWORD pid = 0;
+    //GetWindowThreadProcessId(hwnd, &pid);
+    //if (pid == 0) return;
+
+    // doesn't have a titlebar?
+    //LONG style = GetWindowLongW(hwnd, GWL_STYLE);
+    //if (!(style & WS_CAPTION)) return;
+
+    QMetaObject::invokeMethod(s_instance, [hwnd]() {
+        s_instance->windowCreated(reinterpret_cast<quintptr>(hwnd));
+    }, Qt::QueuedConnection);
 }

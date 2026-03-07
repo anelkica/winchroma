@@ -10,11 +10,6 @@ import winchroma
 
     otherwise, qt laughs and says no :3
 */
-/*
-    TODO:
-        - separate pieces of code here into components
-        - general UI refactor for more responsiveness?
-*/
 
 ApplicationWindow {
     id: root
@@ -33,17 +28,36 @@ ApplicationWindow {
     Component { id: bordersPage; BordersPage {} }
     Component { id: titlebarsPage; TitlebarsPage {} }
     Component { id: highlightsPage; HighlightsPage {} }
+    Component { id: configPage; ConfigPage {} }
 
     property var navModel: [
         { icon: "qrc:/icons/border_none_24_regular.svg", label: "Borders", page: bordersPage },
         { icon: "qrc:/icons/window_header_horizontal_24_regular.svg", label: "Titlebars", page: titlebarsPage },
         { icon: "qrc:/icons/highlight_24_regular.svg", label: "Highlights", page: highlightsPage },
-        //{ icon: "qrc:/icons/border_none_24_regular.svg", label: "Accents" },
     ]
 
     Component.onCompleted: {
+        ConfigManager.loadConfig("config.toml")
         WindowWatcher.startWatching()
         RegistryManager.setKey("Control Panel\\Colors")
+    }
+
+    Connections {
+        target: WindowWatcher
+        function onWindowCreated(hwnd) { // hwnd type is quintptr btw
+            if (ConfigManager.hasMatchingRule(hwnd)) {
+                ConfigManager.applyRulesToWindow(hwnd)
+            } else {
+                if (AppSettings.borderEnabled)
+                    WindowEffects.setWindowBorderByHWND(hwnd, AppSettings.borderColor)
+
+                if (AppSettings.titlebarColorEnabled)
+                    WindowEffects.setWindowCaptionColorByHWND(hwnd, AppSettings.titlebarColor)
+
+                if (AppSettings.titlebarTextEnabled)
+                    WindowEffects.setWindowCaptionTextColorByHWND(hwnd, AppSettings.titlebarTextColor)
+            }
+        }
     }
 
     RowLayout {
@@ -169,7 +183,7 @@ ApplicationWindow {
 
                 Item { Layout.fillHeight: true }
 
-                // settings (or info? idk, i'll keep it as placeholder)
+                // configuration
                 ItemDelegate {
                     Layout.preferredWidth: root.expandedWidth
                     Layout.preferredHeight: 40
@@ -177,11 +191,17 @@ ApplicationWindow {
                     rightPadding: 0
                     topPadding: 0
                     bottomPadding: 0
+                    highlighted: root.activeIndex === -1
+
+                    onClicked: {
+                        root.activeIndex = -1
+                        contentStack.replace(configPage)
+                    }
 
                     contentItem: RowLayout {
                         spacing: 10
                         Image {
-                            source: "qrc:/icons/settings_24_regular.svg"
+                            source: "qrc:/icons/document_settings_24_regular.svg"
                             sourceSize: Qt.size(20, 20)
                             Layout.alignment: Qt.AlignVCenter
 
@@ -193,7 +213,7 @@ ApplicationWindow {
                             }
                         }
                         Label {
-                            text: "Settings"
+                            text: "Configuration"
                             color: palette.windowText
                             Layout.fillWidth: true
                             opacity: root.sidebarOpen ? 1 : 0
@@ -220,7 +240,7 @@ ApplicationWindow {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            initialItem: navModel[root.activeIndex].page
+            initialItem: root.activeIndex > -1 ? navModel[root.activeIndex].page : configPage
 
             replaceEnter: Transition {
                 NumberAnimation {

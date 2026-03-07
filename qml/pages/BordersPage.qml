@@ -9,16 +9,17 @@ Item {
 
     property bool hasChanges: true
 
-    Component.onCompleted: {
-        borderColorPanel.setColor(AppSettings.borderColor)
+    // this Connection exists because i can't be bothered to figure out why it's not syncing
+    // ConfigManager should update borderColor, but BordersPage isn't syncing right, but this fixes it, for now
+    Connections {
+        target: ConfigManager
+        function onConfigLoaded() {
+            borderColorPanel.setColor(AppSettings.borderColor)
+        }
     }
 
-    Connections {
-        target: WindowWatcher
-        function onWindowCreated(hwnd) {
-            if (borderColorPanel.customizationEnabled)
-                WindowEffects.setWindowBorderByHWND(hwnd, borderColorPanel.pickedColor)
-        }
+    Component.onCompleted: {
+        borderColorPanel.setColor(AppSettings.borderColor)
     }
 
     ColumnLayout {
@@ -115,6 +116,7 @@ Item {
                     else
                         WindowEffects.resetAllWindowBorders()
 
+                    ConfigManager.reapplyAllRules()
                     hasChanges = false
                 }
             }

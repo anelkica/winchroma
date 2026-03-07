@@ -1,8 +1,12 @@
 #include "window_effects.h"
-
+#include "app_settings.hpp"
 #include <dwmapi.h>
 
-WindowEffects::WindowEffects(QObject *parent) : QObject{parent} {}
+static WindowEffects *s_instance = nullptr;
+
+WindowEffects *WindowEffects::instance() { return s_instance; }
+
+WindowEffects::WindowEffects(QObject *parent) : QObject{parent} { s_instance = this; }
 WindowEffects::~WindowEffects() {
     resetAllWindowBorders();
     resetAllWindowCaptionColors();
@@ -33,6 +37,19 @@ Q_INVOKABLE quintptr WindowEffects::getPreviewHWND() {
         return m_previewWindow->winId();
 
     return 0; // doesn't exist
+}
+
+Q_INVOKABLE void WindowEffects::reapplyEffectsToAllWindows() {
+    AppSettings *settings = AppSettings::instance();
+
+    if (settings->borderEnabled())
+        setAllWindowBorders(settings->borderColor());
+
+    if (settings->titlebarColorEnabled())
+        setAllWindowCaptionColors(settings->titlebarColor());
+
+    if (settings->titlebarTextEnabled())
+        setAllWindowCaptionTextColors(settings->titlebarTextColor());
 }
 
 // -- BORDER COLORS -- //

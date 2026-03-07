@@ -8,5 +8,6 @@
         <file>icons/highlight_24_regular.svg</file>
         <file>icons/info_24_regular.svg</file>
         <file>icons/settings_24_regular.svg</file>
+        <file>icons/document_settings_24_regular.svg</file>
     </qresource>
 </RCC>

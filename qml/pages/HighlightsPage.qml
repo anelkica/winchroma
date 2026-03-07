@@ -53,6 +53,15 @@ Item {
             wrapMode: Text.WordWrap
         }
 
+        Label {
+            text: "These settings are saved to Windows registry and apply system-wide."
+            font.pixelSize: 14
+            color: Qt.darker(palette.windowText, 1.2)
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignTop
+            wrapMode: Text.WordWrap
+        }
+
         ScrollView {
             Layout.topMargin: 12
             Layout.fillWidth: true

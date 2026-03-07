@@ -16,8 +16,11 @@ public:
     explicit WindowEffects(QObject *parent = nullptr);
     ~WindowEffects();
 
+    static WindowEffects *instance();
+
     Q_INVOKABLE quintptr openPreviewWindow(); // returns HWND (quintptr) if it's already open
     Q_INVOKABLE quintptr getPreviewHWND(); // returns 0 if it doesn't exist, good for checking if it exists
+    Q_INVOKABLE void reapplyEffectsToAllWindows();
 
     // -- BORDER COLORS -- //
 

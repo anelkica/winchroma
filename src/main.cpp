@@ -6,6 +6,10 @@
 #include <dwmapi.h>
 #include <windows.h>
 
+#include "app_settings.hpp"
+#include "config_manager.h"
+
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
@@ -38,7 +42,6 @@ int main(int argc, char *argv[])
     });
 
     engine.loadFromModule("winchroma", "Main");
-
 
     return app.exec();
 }
