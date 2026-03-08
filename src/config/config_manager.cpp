@@ -3,8 +3,8 @@
 #include "app_settings.hpp"
 #include "process_utils.h"
 #include <QFile>
+#include <QFileInfo>
 #include <QStandardPaths>
-#include <QDir>
 #include <QDesktopServices>
 #include <toml.hpp>
 
@@ -20,6 +20,18 @@ Q_INVOKABLE void ConfigManager::openConfig() const {
 }
 
 bool ConfigManager::loadConfig(const QString &path) {
+    QFileInfo fileInfo(path);
+
+    if (!fileInfo.exists()) {
+        emit error(QString("Config file not found"));
+        return false;
+    }
+
+    if (!fileInfo.isReadable()) {
+        emit error(QString("Config file not readable"));
+        return false;
+    }
+
     try {
         const toml::table config = toml::parse_file(path.toStdString());
 
@@ -48,7 +60,6 @@ bool ConfigManager::loadConfig(const QString &path) {
         const auto *rulesArray = config.get_as<toml::array>("rules");
         if (!rulesArray) {
             qDebug() << "No [[rules]] array found";
-            m_rules.clear();
         } else {
             m_rules.clear();
 
@@ -76,6 +87,8 @@ bool ConfigManager::loadConfig(const QString &path) {
                     const QString titlePattern = QString::fromStdString(std::string(titleNode->get()));
                     if (!titlePattern.isEmpty()) {
                         rule.titleRegex = QRegularExpression(titlePattern);
+                        rule.titleRegex.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+
                         if (!rule.titleRegex.isValid()) {
                             emit error(QString("invalid title regex in rule '%1': %2").arg(rule.name, rule.titleRegex.errorString()));
                             continue;
@@ -88,6 +101,8 @@ bool ConfigManager::loadConfig(const QString &path) {
                     const QString processPattern = QString::fromStdString(std::string(processNode->get()));
                     if (!processPattern.isEmpty()) {
                         rule.processRegex = QRegularExpression(processPattern);
+                        rule.processRegex.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
+
                         if (!rule.processRegex.isValid()) {
                             emit error(QString("invalid process regex in rule '%1': %2").arg(rule.name, rule.processRegex.errorString()));
                             continue;
@@ -154,6 +169,12 @@ bool ConfigManager::loadConfig(const QString &path) {
 }
 
 bool ConfigManager::saveConfig(const QString &path) {
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        emit error("Cannot save config: unable to open file");
+        return false;
+    }
+
     try {
         AppSettings *settings = AppSettings::instance();
 
@@ -196,12 +217,6 @@ bool ConfigManager::saveConfig(const QString &path) {
         config.insert_or_assign("globals", std::move(globals));
         config.insert_or_assign("rules", std::move(rules));
 
-        QFile file(path);
-        if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            emit error(QString("failed to open config for writing: %1").arg(file.errorString()));
-            return false;
-        }
-
         std::ostringstream oss;
         oss << config;
         QTextStream(&file) << QString::fromStdString(oss.str());
@@ -212,7 +227,7 @@ bool ConfigManager::saveConfig(const QString &path) {
         return true;
 
     } catch (const std::exception &err) {
-        emit error(QString("failed to save config: %1").arg(err.what()));
+        emit error(QString("Cannot save config: %1").arg(err.what()));
         return false;
     }
 }
@@ -228,7 +243,7 @@ bool ConfigManager::hasMatchingRule(quintptr hwnd) {
     return findMatchingRule(title, process).has_value();
 }
 
-std::optional<WindowRule> ConfigManager::findMatchingRule(const QString &windowTitle, const QString &processName) {
+std::optional<WindowRule> ConfigManager::findMatchingRule(const QString &windowTitle, const QString &processName) const {
     for (const auto &rule : std::as_const(m_rules)) {
         bool hasTitlePattern = !rule.titleRegex.pattern().isEmpty();
         bool hasProcessPattern = !rule.processRegex.pattern().isEmpty();

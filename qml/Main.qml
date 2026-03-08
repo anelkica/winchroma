@@ -37,7 +37,9 @@ ApplicationWindow {
     ]
 
     Component.onCompleted: {
-        ConfigManager.loadConfig("config.toml")
+        ConfigManager.loadConfig(ConfigManager.configPath)
+        ConfigManager.reapplyAllRules()
+
         WindowWatcher.startWatching()
         RegistryManager.setKey("Control Panel\\Colors")
     }
@@ -57,6 +59,28 @@ ApplicationWindow {
                 if (AppSettings.titlebarTextEnabled)
                     WindowEffects.setWindowCaptionTextColorByHWND(hwnd, AppSettings.titlebarTextColor)
             }
+        }
+    }
+
+    Connections {
+        target: ConfigManager
+        function onError(message) {
+            infoToast.show(message)
+        }
+
+        function onConfigLoaded() {
+            infoToast.show("Config loaded")
+        }
+
+        function onConfigSaved() {
+            infoToast.show("Config saved")
+        }
+    }
+
+    Connections {
+        target: RegistryManager
+        function onRegistrySaved() {
+            infoToast.show("Saved to registry")
         }
     }
 
@@ -262,5 +286,9 @@ ApplicationWindow {
                 }
             }
         }
+    }
+
+    Toast {
+        id: infoToast
     }
 }

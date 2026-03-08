@@ -66,18 +66,25 @@ std::expected<void, winreg::RegResult> RegistryManager::WriteString(const std::w
 // -- QML HANDLERS -- //
 void RegistryManager::restoreDefaults() {
     auto result = WriteString(L"Hilight", QColorToWString(AppDefaults::Hilight));
-    if (!result)
-        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+    if (!result) {
+        emit error(QString::fromStdWString(result.error().ErrorMessage()));
+        return;
+    }
 
     result = WriteString(L"HilightText", QColorToWString(AppDefaults::HilightText));
-    if (!result)
-        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+    if (!result) {
+        emit error(QString::fromStdWString(result.error().ErrorMessage()));
+        return;
+    }
 
     result = WriteString(L"HotTrackingColor", QColorToWString(AppDefaults::HotTrackingColor));
-    if (!result)
-        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+    if (!result) {
+        emit error(QString::fromStdWString(result.error().ErrorMessage()));
+        return;
+    }
 
     broadcastColorChange(AppDefaults::Hilight, AppDefaults::HotTrackingColor);
+    emit registrySaved();
 }
 
 void RegistryManager::broadcastColorChange(const QColor &hilight, const QColor &hotTrackingColor) {
@@ -130,7 +137,7 @@ bool RegistryManager::setKey(const QString &subkey) {
     // there's really no reason not to use HKEY_CURRENT_USER, unless we're gonna read system Accent color?
     auto result = SetKey(HKEY_CURRENT_USER, subkey.toStdWString());
     if (!result) {
-        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+        emit error(QString::fromStdWString(result.error().ErrorMessage()));
         return false;
     }
     return true;
@@ -139,7 +146,7 @@ bool RegistryManager::setKey(const QString &subkey) {
 unsigned int RegistryManager::readDword(const QString &valueName) {
     auto result = ReadDword(valueName.toStdWString());
     if (!result) {
-        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+        emit error(QString::fromStdWString(result.error().ErrorMessage()));
         return 0;
     }
     return result.value();
@@ -148,16 +155,17 @@ unsigned int RegistryManager::readDword(const QString &valueName) {
 bool RegistryManager::writeDword(const QString &valueName, unsigned int value) {
     auto result = WriteDword(valueName.toStdWString(), value);
     if (!result) {
-        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+        emit error(QString::fromStdWString(result.error().ErrorMessage()));
         return false;
     }
+    emit registrySaved();
     return true;
 }
 
 QString RegistryManager::readString(const QString &valueName) {
     auto result = ReadString(valueName.toStdWString());
     if (!result) {
-        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+        emit error(QString::fromStdWString(result.error().ErrorMessage()));
         return {};
     }
     return QString::fromStdWString(result.value());
@@ -166,8 +174,9 @@ QString RegistryManager::readString(const QString &valueName) {
 bool RegistryManager::writeString(const QString &valueName, const QString &value) {
     auto result = WriteString(valueName.toStdWString(), value.toStdWString());
     if (!result) {
-        emit errorOccurred(QString::fromStdWString(result.error().ErrorMessage()));
+        emit error(QString::fromStdWString(result.error().ErrorMessage()));
         return false;
     }
+    emit registrySaved();
     return true;
 }

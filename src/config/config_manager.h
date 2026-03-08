@@ -7,6 +7,7 @@
 #include <QRegularExpression>
 #include <QColor>
 #include <optional>
+#include <QDir>
 #include <QList>
 
 struct WindowRule {
@@ -48,10 +49,10 @@ signals:
 
 private:
     static inline ConfigManager *s_instance = nullptr;
-    std::optional<WindowRule> findMatchingRule(const QString &windowTitle, const QString &processName);
+    std::optional<WindowRule> findMatchingRule(const QString &windowTitle, const QString &processName) const;
 
     QList<WindowRule> m_rules;
-    QString m_configPath = QCoreApplication::applicationDirPath() + "config.toml";
+    QString m_configPath = QDir(QCoreApplication::applicationDirPath()).filePath("config.toml");
 };
 
 #endif // CONFIG_MANAGER_H

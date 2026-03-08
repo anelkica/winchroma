@@ -29,7 +29,11 @@ Item {
         }
     }
 
-    Component.onCompleted: updateColors()
+    Component.onCompleted: {
+        updateColors()
+
+        hasChanges = AppSettings.hilightEnabled || AppSettings.hilightTextEnabled || AppSettings.hotTrackingEnabled
+    }
 
     ColumnLayout {
         anchors.margins: 24
@@ -80,6 +84,16 @@ Item {
                         font.letterSpacing: 0.75
                     }
 
+                    Label {
+                        text: "Affects selected text background color and mouse drag border color"
+                        font.pixelSize: 12
+                        font.weight: Font.Light
+                        color: Qt.darker(palette.windowText, 1.25)  // More muted
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                        opacity: 0.8  // Extra subtlety
+                    }
+
                     Rectangle {
                         Layout.fillWidth: true
                         Layout.preferredHeight: 1
@@ -108,6 +122,16 @@ Item {
                         font.weight: Font.Medium
                         font.pixelSize: 12
                         font.letterSpacing: 0.75
+                    }
+
+                    Label {
+                        text: "Affects the color of selected text itself"
+                        font.pixelSize: 12
+                        font.weight: Font.Light
+                        color: Qt.darker(palette.windowText, 1.25)  // More muted
+                        Layout.fillWidth: true
+                        wrapMode: Text.WordWrap
+                        opacity: 0.8  // Extra subtlety
                     }
 
                     Rectangle {
@@ -173,14 +197,11 @@ Item {
                 text: "Restore Defaults"
                 onClicked: {
                     RegistryManager.restoreDefaults()
+                    AppSettings.setHilightDefaults()
+                    updateColors()
+                    okDialog.open()
 
-                    confirmDialog.title = "Defaults Restored"
-                    confirmDialog.message = "Highlights have been reset to Windows default"
-                    confirmDialog.open()
-
-                    // update color panels?
-
-                    hasChanges = true
+                    hasChanges = false
                 }
             }
 
@@ -192,13 +213,20 @@ Item {
                 highlighted: hasChanges
                 enabled: hasChanges
                 onClicked: {
-                    let textHighlightColorString = RegistryManager.colorToRegistryString(textHighlightColorPanel.pickedColor)
-                    let highlightedTextColorString = RegistryManager.colorToRegistryString(highlightedTextColorPanel.pickedColor)
-                    let mouseDragColorString = RegistryManager.colorToRegistryString(mouseDragColorPanel.pickedColor)
+                    if (AppSettings.hilightEnabled) {
+                        let textHighlightColorString = RegistryManager.colorToRegistryString(textHighlightColorPanel.pickedColor)
+                        RegistryManager.writeString("Hilight", textHighlightColorString)
+                    }
 
-                    RegistryManager.writeString("Hilight", textHighlightColorString)
-                    RegistryManager.writeString("HilightText", highlightedTextColorString)
-                    RegistryManager.writeString("HotTrackingColor", mouseDragColorString)
+                    if (AppSettings.hilightTextEnabled) {
+                        let highlightedTextColorString = RegistryManager.colorToRegistryString(highlightedTextColorPanel.pickedColor)
+                        RegistryManager.writeString("HilightText", highlightedTextColorString)
+                    }
+
+                    if (AppSettings.hotTrackingColorEnabled) {
+                        let mouseDragColorString = RegistryManager.colorToRegistryString(mouseDragColorPanel.pickedColor)
+                        RegistryManager.writeString("HotTrackingColor", mouseDragColorString)
+                    }
 
                     RegistryManager.broadcastColorChange(textHighlightColorPanel.pickedColor, mouseDragColorPanel.pickedColor)
                     hasChanges = false
@@ -207,22 +235,10 @@ Item {
         }
     }
 
-    Dialog {
-        id: confirmDialog
+    OkDialog {
+        id: okDialog
 
-        // https://stackoverflow.com/questions/79379004/qml-binding-loop-detected-for-property-implicitheight/79416343#79416343
-        implicitWidth: dialogLabel.implicitWidth + leftPadding + rightPadding
-        implicitHeight: implicitHeaderHeight + implicitFooterHeight + dialogLabel.implicitHeight + topPadding + bottomPadding
-        modal: true
-
-        anchors.centerIn: parent
-        standardButtons: Dialog.Ok
-
-        property alias message: dialogLabel.text
-
-        contentItem: Label {
-            id: dialogLabel
-            wrapMode: Text.WordWrap
-        }
+        title: "Defaults Restored"
+        message: "Highlights have been reset to Windows defaults"
     }
 }

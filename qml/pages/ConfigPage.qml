@@ -6,7 +6,7 @@ import QtQuick.Dialogs
 import winchroma
 
 Item {
-    id: configPageRoot
+    id: configPageRoo
 
     ColumnLayout {
         anchors.margins: 24
@@ -68,7 +68,7 @@ Item {
             Button {
                 text: "Reload"
                 onClicked: {
-                    ConfigManager.loadConfig("config.toml")
+                    ConfigManager.loadConfig(ConfigManager.configPath)
                     WindowEffects.reapplyEffectsToAllWindows()
                     ConfigManager.reapplyAllRules()
                 }

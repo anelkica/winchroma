@@ -6,12 +6,18 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
+set(PLATFORM_RESOURCES "")
+
+if(WIN32)
+    set(PLATFORM_RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/windows_app_icon.rc")
+endif()
+
 find_package(Qt6 REQUIRED COMPONENTS Quick QuickControls2) # QuickControls2 for Windows theme
 
 qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_resources(RESOURCES resources.qrc) # why doesn't Qt Creator do this by itself???
-qt_add_executable(appwinchroma src/main.cpp ${RESOURCES})
+qt_add_executable(appwinchroma src/main.cpp ${RESOURCES} ${PLATFORM_RESOURCES})
 
 qt_add_qml_module(appwinchroma
     URI winchroma
@@ -33,6 +39,9 @@ qt_add_qml_module(appwinchroma
         resources.qrc
         config.toml
         QML_FILES qml/pages/ConfigPage.qml
+        QML_FILES qml/components/OkDialog.qml
+        QML_FILES qml/components/Toast.qml
+        RESOURCES windows_app_icon.rc
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -68,4 +77,11 @@ install(TARGETS appwinchroma
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+# Copy config.toml to build directory after build
+add_custom_command(TARGET appwinchroma POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/config.toml"
+        $<TARGET_FILE_DIR:appwinchroma>/config.toml
 )

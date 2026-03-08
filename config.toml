@@ -1,14 +1,23 @@
+schema_version = 1
+
+# Global default colors applied to all windows
 [globals]
-border                = "#ff99cc"
-border_enabled        = true
+border = "#ff99cc"                # Hex color (#RRGGBB or #RGB)
+border_enabled = true               # Enable border customization
+titlebar = "#191919"              # Titlebar background color
+titlebar_enabled = false            # Enable titlebar customization
+titlebar_text = "#ffffff"         # Titlebar text color
+titlebar_text_enabled = false       # Enable titlebar text customization
 
-titlebar              = "#191919"
-titlebar_enabled      = false
-
-titlebar_text         = "#ffffff"
-titlebar_text_enabled = false
+[[rules]]
+name = "winchroma app! :)"          # Rule identifier (required)
+#process = "winchroma.exe"          # Process name regex (case-insensitive)
+title = ".*winchroma.*"             # Window title regex (alternative to process)
+border = "#ff99cc"                # Override border color
+titlebar = "#191919"              # Override titlebar color
+# titlebar_text = "#ffffff"       # Override titlebar text color
 
 [[rules]]
 name = "notepad green border"
-process = "Notepad.exe"
+process = "notepad.exe"
 border = "#8bf7c5"

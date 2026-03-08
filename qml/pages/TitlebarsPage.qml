@@ -7,11 +7,30 @@ import winchroma
 Item {
     id: titlebarsPageRoot
 
-    property bool hasChanges: true
+    property bool hasChanges: false
+
+    function applyEffectsToCurrentWindows() {
+        titlebarColorPanel.setColor(AppSettings.titlebarColor) // insurance policy incase they don't get set
+        titlebarTextColorPanel.setColor(AppSettings.titlebarTextColor)
+
+        if (titlebarColorPanel.customizationEnabled)
+            WindowEffects.setAllWindowCaptionColors(titlebarColorPanel.pickedColor)
+        else
+            WindowEffects.resetAllWindowCaptionColors()
+
+        if (titlebarTextColorPanel.customizationEnabled)
+            WindowEffects.setAllWindowCaptionTextColors(titlebarTextColorPanel.pickedColor)
+        else
+            WindowEffects.resetAllWindowCaptionTextColors()
+
+        ConfigManager.reapplyAllRules()
+    }
 
     Component.onCompleted: {
         titlebarColorPanel.setColor(AppSettings.titlebarColor)
         titlebarTextColorPanel.setColor(AppSettings.titlebarTextColor)
+
+        hasChanges = AppSettings.titlebarColorEnabled || AppSettings.titlebarTextEnabled
     }
 
     ColumnLayout {
@@ -128,6 +147,20 @@ Item {
             Layout.alignment: Qt.AlignRight
 
             Button {
+                text: "Restore Defaults"
+                onClicked: {
+                    AppSettings.setTitlebarDefaults()
+                    ConfigManager.saveConfig("config.toml")
+                    applyEffectsToCurrentWindows()
+                    okDialog.open()
+
+                    hasChanges = false
+                }
+            }
+
+            Item { Layout.fillWidth: true } // spacer
+
+            Button {
                 text: "Preview"
                 onClicked: {
                     let hwnd = WindowEffects.openPreviewWindow();
@@ -140,20 +173,18 @@ Item {
                 highlighted: hasChanges
                 enabled: hasChanges
                 onClicked: {
-                    if (titlebarColorPanel.customizationEnabled)
-                        WindowEffects.setAllWindowCaptionColors(titlebarColorPanel.pickedColor)
-                    else
-                        WindowEffects.resetAllWindowCaptionColors()
+                    applyEffectsToCurrentWindows()
+                    ConfigManager.saveConfig("config.toml")
 
-                    if (titlebarTextColorPanel.customizationEnabled)
-                        WindowEffects.setAllWindowCaptionTextColors(titlebarTextColorPanel.pickedColor)
-                    else
-                        WindowEffects.resetAllWindowCaptionTextColors()
-
-                    ConfigManager.reapplyAllRules()
                     hasChanges = false
                 }
             }
         }
+    }
+
+    OkDialog {
+        id: okDialog
+        title: "Defaults Restored"
+        message: "Titlebars have been reset to app defaults"
     }
 }

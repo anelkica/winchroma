@@ -1,4 +1,5 @@
 # 🎨 winchroma
+[![Download](https://img.shields.io/badge/download-latest-32CD32?style=flat-square&logo=github)](https://github.com/anelkica/winchroma/releases/latest) <br />
 ![C++](https://img.shields.io/badge/C++-23-blue?style=flat-square&logo=c%2B%2B)
 ![Qt](https://img.shields.io/badge/Qt-6.10-41CD52?style=flat-square&logo=qt)
 ![Windows](https://custom-icon-badges.demolab.com/badge/Windows-0078D6?logo=windows11&logoColor=white)
@@ -19,6 +20,4 @@ This project uses `C++23`.
 - [WinReg - GiovanniDicanio](https://github.com/GiovanniDicanio/WinReg)
 
 ## 📸 Screenshots
-<div align="center">
-    <img width="677" height="398" src="https://github.com/user-attachments/assets/c0b164bd-6510-4aec-a8f3-26c18549856d">
-</div>
+<img width="257" height="184" alt="Image" src="https://github.com/user-attachments/assets/d83f1e44-713e-4f0c-924f-01f82bbfa8e6" />

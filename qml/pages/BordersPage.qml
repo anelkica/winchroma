@@ -9,6 +9,17 @@ Item {
 
     property bool hasChanges: true
 
+    function applyEffectsToCurrentWindows() {
+        borderColorPanel.setColor(AppSettings.borderColor) // insurance policy if it doesn't update
+
+        if (borderColorPanel.customizationEnabled)
+            WindowEffects.setAllWindowBorders(borderColorPanel.pickedColor)
+        else
+            WindowEffects.resetAllWindowBorders()
+
+        ConfigManager.reapplyAllRules()
+    }
+
     // this Connection exists because i can't be bothered to figure out why it's not syncing
     // ConfigManager should update borderColor, but BordersPage isn't syncing right, but this fixes it, for now
     Connections {
@@ -20,6 +31,8 @@ Item {
 
     Component.onCompleted: {
         borderColorPanel.setColor(AppSettings.borderColor)
+
+        hasChanges = AppSettings.borderEnabled
     }
 
     ColumnLayout {
@@ -98,6 +111,20 @@ Item {
             Layout.alignment: Qt.AlignRight
 
             Button {
+                text: "Restore Defaults"
+                onClicked: {
+                    AppSettings.setBorderDefaults()
+                    ConfigManager.saveConfig("config.toml")
+                    applyEffectsToCurrentWindows()
+                    okDialog.open()
+
+                    hasChanges = false
+                }
+            }
+
+            Item { Layout.fillWidth: true } // spacer
+
+            Button {
                 text: "Preview"
                 onClicked: {
                     let hwnd = WindowEffects.openPreviewWindow();
@@ -111,15 +138,18 @@ Item {
                 highlighted: hasChanges
                 enabled: hasChanges
                 onClicked: {
-                    if (borderColorPanel.customizationEnabled)
-                        WindowEffects.setAllWindowBorders(borderColorPanel.pickedColor)
-                    else
-                        WindowEffects.resetAllWindowBorders()
+                    applyEffectsToCurrentWindows()
+                    ConfigManager.saveConfig("config.toml")
 
-                    ConfigManager.reapplyAllRules()
                     hasChanges = false
                 }
             }
         }
+    }
+
+    OkDialog {
+        id: okDialog
+        title: "Defaults Restored"
+        message: "Borders have been reset to app defaults"
     }
 }
